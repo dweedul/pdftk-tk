@@ -1,0 +1,1 @@
+pdftk %1 cat 1-endE output %1_cw.pdf
