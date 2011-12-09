@@ -1,0 +1,46 @@
+#!/bin/sh -e
+
+# get the number of pages from the pdftk data dump
+# 
+# __resultvar = The variable to store the result in
+# pdf = the pdf to count the pages in
+numPages () {
+  local  __resultvar=$1
+  local  myresult='some value'
+
+  local pgs=0
+
+  # if the file exists then do the command to get the number of pages
+  [ -e "$2" ] && pgs=`pdftk.exe $2 dump_data | grep NumberOfPages | awk '{print $2}'`
+
+  eval $__resultvar="'$pgs'"
+}
+
+: <<DOCUMENTATION_MSG
+Get the number of pages for the given pdf file.
+--help, -h : this help information
+DOCUMENTATION_MSG
+
+# exit codes; keep these within the range of 64-113
+EXIT_DOC_REQUEST=64
+EXIT_ABORT=113
+
+# parse command line parameters
+while [ $# -gt 0 ]
+do
+  token="$1" && shift
+  case "$token" in
+    --help|-h)
+      echo; echo "Usage: $0 [options]"; echo
+      sed --silent -e '/DOCUMENTATION_MSG$/,/^DOCUMENTATION_MSG$/p' "$0" |
+      sed -e '/DOCUMENTATION_MSG$/d'; exit $EXIT_DOC_REQUEST
+      ;;
+    *)
+      filename="$token"
+  esac
+done
+
+[ ! -e "$filename" ] && exit $EXIT_ABORT
+
+numPages count $filename
+echo $count
