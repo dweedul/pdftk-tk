@@ -1,0 +1,98 @@
+#!/bin/sh -e
+
+# 2 pages per side, 2 sided printing
+PAGES_PER_SHEET=4
+
+: <<DOCUMENTATION_MSG
+Usage: $0  [options] <source filename>
+
+Build a pad of pages from a source document to the number of pages specified.
+
+Options:
+--sheets   : sheets per signature, defaults to 6
+--filespec : the format for the output filename in printf formatting
+--help, -h : this help information
+DOCUMENTATION_MSG
+
+# exit codes; keep these within the range of 64-113
+EXIT_DOC_REQUEST=64
+EXIT_ABORT=113
+
+# Splits the pdf into signatures
+#
+# file - the file to split
+# [sheets] - number of sheets in the signature, defaults to 6
+# [filespec] - the format for the output filename in printf formatting
+#
+# outputs a series of pdfs
+makeSignatures () {
+  # required inputs
+  local file=$1
+  local sheets=6
+  local filespec="$(basename $file .pdf).sig%03d.pdf"
+
+  # optional inputs
+  [ -n "$2" ] && sheets=$2
+  [ -n "$3" ] && filespec=$3
+
+  # local variable declarations
+  local pages_per_sheet=$PAGES_PER_SHEET
+  local pages_per_sig=0
+  local i=0
+  local filepages=0
+
+  # exit with an error if the file doesn't exist
+  [ ! -e "$file" ] && exit $EXIT_ABORT
+
+  # find the pages per signature & pages in input file
+  (( pages_per_sig = $sheets * $pages_per_sheet ))
+  file_pages=`num-pages $file`
+
+  # figure the number of signatures needed
+  # then add 1 if there is a remainder
+  (( num_sigs = $file_pages / $pages_per_sig))
+  (( $file_pages % $pages_per_sig > 0 )) && (( num_sigs++ ))
+
+  local start=0
+  local end=0
+  while (( i < num_sigs ))
+  do
+    # set the start to 1 more than the end of the last file
+    (( start = 1 + $end ))
+    
+    # set the end to the number of pages per signature or "end"
+    (( end = $end + $pages_per_sig ))
+    (( $end > $file_pages )) && end="end"
+
+    local outfile=`printf $filespec $i`
+
+    pdftk $file cat $start-$end output $outfile
+    (( i++ ))
+  done
+}
+
+# parse command line parameters
+while [ $# -gt 0 ]
+do
+  token="$1" && shift
+  case "$token" in
+    --sheets)
+      sheets_per_sig="$1" && shift
+      ;;
+    --filespec)
+      filespec="$1" && shift
+      ;;
+    --help|-h)
+      echo
+      sed --silent -e '/DOCUMENTATION_MSG$/,/^DOCUMENTATION_MSG$/p' "$0" |
+      sed -e '/DOCUMENTATION_MSG$/d' |
+      sed -e s/'$0'/`basename $0`/
+      exit $EXIT_DOC_REQUEST
+      ;;
+    *)
+      filename="$token"
+  esac
+done
+
+makeSignatures $filename $sheets_per_sig $filespec
+exit $?

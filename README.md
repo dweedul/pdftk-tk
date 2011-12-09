@@ -24,11 +24,15 @@ Repeats a pdf to some number of pages.  Useful for making pads of blank or ruled
 
     build-pad <pdf filename> <number of pages> [output filename]
 
-__make-signatures__
+__signature-split__
 
-Makes signatures from a given pdf.
+Splits a given pdf into signatures for binding
 
-    make-sigs <filename> [pages-per-signature]
+    make-sigs <filename> [options]
+
+    options:
+    --sheets   : number of sheets per signature, defaults to 6
+    --filespec : the format for the output filename in printf formatting
 
 ## Windows Batch Files
 
