@@ -1,0 +1,84 @@
+#!/bin/sh -e
+
+DEFAULT_OUTPUT_FILENAME="pad.pdf"
+
+: <<DOCUMENTATION_MSG
+Usage: $0  [options] <source filename> <page count> [output filename]
+
+Build a pad of pages from a source document to the number of pages specified.
+
+Options:
+--help, -h : this help information
+DOCUMENTATION_MSG
+
+# exit codes; keep these within the range of 64-113
+EXIT_DOC_REQUEST=64
+EXIT_ABORT=113
+
+# build a pad of papers with the given number of pages
+# 
+# source    - pdf with the original pages
+# num_pages - Number of pages needed.
+# [output]  - The output pdf
+buildPad () {
+  
+  # required inputs
+  local source=$1
+  local num_pages=$2
+  local output=$DEFAULT_OUTPUT_FILENAME
+
+  # optional inputs
+  [ -n $3 ] && output=$3
+
+  # local variable declarations
+  local source_pages=0
+  local rem=0
+  local mul=0
+
+  # exit with an error if the source file doesn't exist
+  [ ! -e "$source" ] && exit $EXIT_ABORT
+
+  # delete the output file if it exists
+  [ -e "$output" ] && rm $output
+
+  # get the number of pages in the source file
+  source_pages=`num-pages $source`
+
+  # get the fractional pages and multiples
+  (( rem = $num_pages % $source_pages ))
+  (( mul = $num_pages / $source_pages ))
+
+  # extract the fractional pages into the pdf first
+  [ "$rem" -gt 0 ] && rng="A1-$rem"
+
+  # add multiple source files as needed to build up the rem
+  while [ "$mul" -gt 0 ]
+  do
+    rng="$rng A"
+    (( mul-- ))
+  done
+
+  pdftk.exe A=$source cat $rng output $output
+}
+
+# parse command line parameters
+while [ $# -gt 0 ]
+do
+  token="$1" && shift
+  case "$token" in
+    --help|-h)
+      echo
+      sed --silent -e '/DOCUMENTATION_MSG$/,/^DOCUMENTATION_MSG$/p' "$0" |
+      sed -e '/DOCUMENTATION_MSG$/d' |
+      sed -e s/'$0'/`basename $0`/
+      exit $EXIT_DOC_REQUEST
+      ;;
+    *)
+      filename="$token"
+      page_count="$1" && shift
+      [ $# -gt 0 ] && output="$1" && shift
+  esac
+done
+
+buildPad $filename $page_count $output
+exit $?

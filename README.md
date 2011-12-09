@@ -12,15 +12,21 @@ This is a small set of bash scripts and windows batch files used for making pdft
 
 __num-pages__
 
-echos the number of pages in the batch file.  This is a dependency for many of the other scripts
+Returns the number of pages in the pdf.  This is a dependency for many of the other scripts
 
     num-pages <pdfname>
 
 ## PDF manipulation
 
+__build-pad__
+
+Repeats a pdf to some number of pages.  Useful for making pads of blank or ruled paper.
+
+    build-pad <pdf filename> <number of pages> [output filename]
+
 __make-signatures__
 
-makes signatures from a given pdf.
+Makes signatures from a given pdf.
 
     make-sigs <filename> [pages-per-signature]
 
