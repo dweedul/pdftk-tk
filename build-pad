@@ -42,7 +42,7 @@ buildPad () {
   [ -e "$output" ] && rm $output
 
   # get the number of pages in the source file
-  source_pages=`num-pages $source`
+  source_pages=`count-pages $source`
 
   # get the fractional pages and multiples
   (( rem = $num_pages % $source_pages ))

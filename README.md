@@ -10,11 +10,11 @@ This is a small set of bash scripts and windows batch files used for making pdft
 
 ## Informational Scripts
 
-__num-pages__
+__count-pages__
 
 Returns the number of pages in the pdf.  This is a dependency for many of the other scripts
 
-    num-pages <pdfname>
+    count-pages <pdfname>
 
 ## PDF manipulation
 

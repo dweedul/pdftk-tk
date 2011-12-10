@@ -46,7 +46,7 @@ makeSignatures () {
 
   # find the pages per signature & pages in input file
   (( pages_per_sig = $sheets * $pages_per_sheet ))
-  file_pages=`num-pages $file`
+  file_pages=`count-pages $file`
 
   # figure the number of signatures needed
   # then add 1 if there is a remainder
