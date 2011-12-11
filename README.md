@@ -16,7 +16,7 @@ Returns the number of pages in the pdf.  This is a dependency for many of the ot
 
     count-pages <pdfname>
 
-__pages-to-signature-break
+__pages-to-signature-break__
 
 Returns the number of pages to the next signature break.  This is very useful in bookbinding projects
 
