@@ -1,0 +1,77 @@
+#!/bin/sh -e
+
+# 2 pages per side, 2 sided printing
+PAGES_PER_SHEET=4
+
+: <<DOCUMENTATION_MSG
+Usage: $0  [options] <source filename>
+
+Build a pad of pages from a source document to the number of pages specified.
+
+Options:
+--sheets   : sheets per signature, defaults to 6
+--help, -h : this help information
+DOCUMENTATION_MSG
+
+# exit codes; keep these within the range of 64-113
+EXIT_DOC_REQUEST=64
+EXIT_ABORT=113
+
+# Find the number of pages it would take to reach the
+# the next signature break
+#
+# __resultvar - the variable to store the results in
+# file        - the file to split
+# [sheets]    - number of sheets in a signature, defaults to 6
+#
+# Returns an integer
+pagesToSignatureBreak () {
+  # required inputs
+  local __resultvar=$1
+  local file=$2
+  local sheets=6
+
+  # optional inputs
+  [ -n "$3" ] && sheets=$3
+
+  # local variable declarations
+  local pages_per_sheet=$PAGES_PER_SHEET
+  local pages_per_sig=0
+
+  # exit with an error if the file doesn't exist
+  [ ! -e "$file" ] && exit $EXIT_ABORT
+
+  # find the pages per signature & pages in input file
+  (( pages_per_sig = $sheets * $pages_per_sheet ))
+  file_pages=`count-pages $file`
+
+  # figure the number of pages needed to reach the next signature break
+  # uses modulo mat to find the solution to 
+  #     (numPages + padding) % k = 0
+  (( padding_pages = $pages_per_sig - $file_pages % $pages_per_sig ))
+
+  eval $__resultvar="'$padding_pages'"
+}
+
+# parse command line parameters
+while [ $# -gt 0 ]
+do
+  token="$1" && shift
+  case "$token" in
+    --sheets)
+      sheets_per_sig="$1" && shift
+      ;;
+    --help|-h)
+      echo
+      sed --silent -e '/DOCUMENTATION_MSG$/,/^DOCUMENTATION_MSG$/p' "$0" |
+      sed -e '/DOCUMENTATION_MSG$/d' |
+      sed -e s/'$0'/`basename $0`/
+      exit $EXIT_DOC_REQUEST
+      ;;
+    *)
+      filename="$token"
+  esac
+done
+
+pagesToSignatureBreak pages $filename $sheets_per_sig
+echo $pages

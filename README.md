@@ -16,6 +16,15 @@ Returns the number of pages in the pdf.  This is a dependency for many of the ot
 
     count-pages <pdfname>
 
+__pages-to-signature-break
+
+Returns the number of pages to the next signature break.  This is very useful in bookbinding projects
+
+    pages-to-signature-break <filename> [options]
+
+    options:
+    --sheets : number of sheets per signature, defaults to 6
+
 ## PDF manipulation
 
 __build-pad__
