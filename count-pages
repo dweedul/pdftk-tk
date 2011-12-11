@@ -6,7 +6,6 @@
 # pdf = the pdf to count the pages in
 numPages () {
   local  __resultvar=$1
-  local  myresult='some value'
 
   local pgs=0
 
