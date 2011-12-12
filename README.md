@@ -37,7 +37,7 @@ __signature-split__
 
 Splits a given pdf into signatures for binding
 
-    make-sigs <filename> [options]
+    signature-split <filename> [options]
 
     options:
     --sheets   : number of sheets per signature, defaults to 6
