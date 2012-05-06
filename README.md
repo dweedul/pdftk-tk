@@ -1,6 +1,6 @@
 # pdftk-tk
 
-This is a small set of bash scripts and windows batch files used for making pdftk just a little easier to use.
+This is a small set of bash scripts and Windows batch files used for making pdftk just a little easier to use.
 
 ## Installing
 
@@ -47,7 +47,7 @@ Splits a given pdf into signatures for binding
 
 These allow for drag-and-drop operations in Windows
 
-  * burst_pdf.cmd
+  * burst_pdf.cmd - splits the file into component pages
   * rotate_pdf_90deg_ccw.cmd
   * rotate_pdf_90deg_cw.cmd
 
